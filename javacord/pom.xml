@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>eu.okaeri</groupId>
+        <artifactId>okaeri-platform</artifactId>
+        <version>0.4.31</version>
+    </parent>
+
+    <groupId>me.night</groupId>
+    <artifactId>javacord</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- core -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-platform-core</artifactId>
+            <version>0.4.31</version>
+        </dependency>
+
+        <!-- persistence -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-flat</artifactId>
+            <version>${library.okaeri-persistence.version}</version>
+        </dependency>
+
+        <!-- configs -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-yaml-snakeyaml</artifactId>
+            <version>${library.okaeri-configs.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javacord</groupId>
+            <artifactId>javacord</artifactId>
+            <version>3.8.0</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-platform-standalone</artifactId>
+            <version>0.4.31</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <!-- json configurer for redis/mongo/jdbc backends -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-configs-json-simple</artifactId>
+            <version>5.0.2</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional redis backend -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-redis</artifactId>
+            <version>2.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional mongo backend -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-mongo</artifactId>
+            <version>2.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- additional jdbc backend with the clients of choice (mariadb/mysql here) -->
+        <dependency>
+            <groupId>eu.okaeri</groupId>
+            <artifactId>okaeri-persistence-jdbc</artifactId>
+            <version>2.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.7.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
+
+    <repository>
+        <id>okaeri-repo</id>
+        <url>https://storehouse.okaeri.eu/repository/maven-public/</url>
+    </repository>
+
+
+</project>

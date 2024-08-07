@@ -1,0 +1,186 @@
+package org.helldev.javacord.platform.message.embed;
+
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.message.component.ComponentType;
+import org.javacord.api.entity.message.component.SelectMenuBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Builder class for creating and configuring a select menu with options in a Discord bot.
+ */
+@Getter
+@Data
+@RequiredArgsConstructor
+public class HellSelectMenuBuilder {
+
+    private final SelectMenuBuilder selectMenuBuilder;
+    private final List<HellSelectOptionBuilder> options = new ArrayList<>();
+
+    private ComponentType selectMenuComponentType = null;
+    private String selectMenuCustomId = null;
+    private String selectMenuPlaceHolder = null;
+    private int selectMenuMinimumValues = 1;
+    private int selectMenuMaximumValues = 3;
+    private Iterable<ChannelType> selectMenuChannelTypes = null;
+    private boolean disabled = false;
+
+    /**
+     * Constructor to initialize the select menu with component type and custom ID.
+     *
+     * @param componentType The type of the component.
+     * @param customId The custom ID for the select menu.
+     */
+    public HellSelectMenuBuilder(ComponentType componentType, String customId) {
+        this.selectMenuBuilder = new SelectMenuBuilder(componentType, customId);
+        this.selectMenuComponentType = componentType;
+        this.selectMenuCustomId = customId;
+    }
+
+    /**
+     * Sets the placeholder text for the select menu.
+     *
+     * @param placeholder The placeholder text.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder setSelectMenuPlaceholder(String placeholder) {
+        selectMenuBuilder.setPlaceholder(placeholder);
+        this.selectMenuPlaceHolder = placeholder;
+        return this;
+    }
+
+    /**
+     * Sets the minimum number of values that can be selected.
+     *
+     * @param minimumValues The minimum number of selectable values.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder setSelectMenuMinimumValues(int minimumValues) {
+        selectMenuBuilder.setMinimumValues(minimumValues);
+        this.selectMenuMinimumValues = minimumValues;
+        return this;
+    }
+
+    /**
+     * Sets the maximum number of values that can be selected.
+     *
+     * @param maximumValues The maximum number of selectable values.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder setSelectMenuMaximumValues(int maximumValues) {
+        selectMenuBuilder.setMaximumValues(maximumValues);
+        this.selectMenuMaximumValues = maximumValues;
+        return this;
+    }
+
+    /**
+     * Adds channel types that can be selected in the menu.
+     *
+     * @param channelTypes The channel types to add.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder addSelectMenuChannelTypes(Iterable<ChannelType> channelTypes) {
+        selectMenuBuilder.addChannelTypes(channelTypes);
+        this.selectMenuChannelTypes = channelTypes;
+        return this;
+    }
+
+    /**
+     * Adds a single option to the select menu.
+     *
+     * @param hellSelectOptionBuilder The option to add.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder addOption(HellSelectOptionBuilder hellSelectOptionBuilder) {
+        selectMenuBuilder.addOption(hellSelectOptionBuilder.toSelectMenuOptionBuilder().build());
+        this.options.add(hellSelectOptionBuilder);
+        return this;
+    }
+
+    /**
+     * Adds multiple options to the select menu.
+     *
+     * @param hellSelectOptionBuilders The options to add.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder addOptions(HellSelectOptionBuilder... hellSelectOptionBuilders) {
+        for (HellSelectOptionBuilder optionBuilder : hellSelectOptionBuilders) {
+            selectMenuBuilder.addOption(optionBuilder.toSelectMenuOptionBuilder().build());
+            this.options.add(optionBuilder);
+        }
+        return this;
+    }
+
+    /**
+     * Removes a single option from the select menu.
+     *
+     * @param hellSelectOptionBuilder The option to remove.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder removeOption(HellSelectOptionBuilder hellSelectOptionBuilder) {
+        selectMenuBuilder.removeOption(hellSelectOptionBuilder.toSelectMenuOptionBuilder().build());
+        this.options.remove(hellSelectOptionBuilder);
+        return this;
+    }
+
+    /**
+     * Removes multiple options from the select menu.
+     *
+     * @param hellSelectOptionBuilders The options to remove.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder removeOptions(HellSelectOptionBuilder... hellSelectOptionBuilders) {
+        for (HellSelectOptionBuilder optionBuilder : hellSelectOptionBuilders) {
+            selectMenuBuilder.removeOption(optionBuilder.toSelectMenuOptionBuilder().build());
+            this.options.remove(optionBuilder);
+        }
+        return this;
+    }
+
+    /**
+     * Removes all options from the select menu.
+     *
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder removeAllOptions() {
+        selectMenuBuilder.removeAllOptions();
+        this.options.clear();
+        return this;
+    }
+
+    /**
+     * Sets the select menu as disabled or enabled.
+     *
+     * @param disabled True to disable the select menu, false to enable it.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder setDisabled(boolean disabled) {
+        selectMenuBuilder.setDisabled(disabled);
+        this.disabled = disabled;
+        return this;
+    }
+
+    /**
+     * Copies the properties of another HellSelectMenuBuilder object into this one.
+     *
+     * @param hellSelectMenuBuilder The HellSelectMenuBuilder object to copy from.
+     * @return The updated HellSelectMenuBuilder object.
+     */
+    public HellSelectMenuBuilder copy(HellSelectMenuBuilder hellSelectMenuBuilder) {
+        selectMenuBuilder.copy(hellSelectMenuBuilder.selectMenuBuilder.build());
+        this.selectMenuComponentType = hellSelectMenuBuilder.selectMenuComponentType;
+        this.selectMenuCustomId = hellSelectMenuBuilder.selectMenuCustomId;
+        this.selectMenuPlaceHolder = hellSelectMenuBuilder.selectMenuPlaceHolder;
+        this.selectMenuMinimumValues = hellSelectMenuBuilder.selectMenuMinimumValues;
+        this.selectMenuMaximumValues = hellSelectMenuBuilder.selectMenuMaximumValues;
+        this.selectMenuChannelTypes = hellSelectMenuBuilder.selectMenuChannelTypes;
+        this.disabled = hellSelectMenuBuilder.disabled;
+        this.options.clear();
+        this.options.addAll(hellSelectMenuBuilder.options);
+        return this;
+    }
+}
