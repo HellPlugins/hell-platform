@@ -65,9 +65,13 @@ public class HellMessage {
                 new MessageBuilder()
                     .setContent(processedMessage)
                     .send(messageable)
-                    .thenAccept(onSuccess)
+                    .thenAccept(message -> {
+                        onSuccess.accept(message);
+                        resetPlaceholders();
+                    })
                     .exceptionally(e -> {
                         onFailure.accept(e);
+                        resetPlaceholders();
                         return null;
                     });
                 break;
@@ -77,9 +81,13 @@ public class HellMessage {
                     .setEmbed(processedEmbed.toEmbedBuilder());
                 addComponentsToMessageBuilder(messageBuilder, processedEmbed);
                 messageBuilder.send(messageable)
-                    .thenAccept(onSuccess)
+                    .thenAccept(message -> {
+                        onSuccess.accept(message);
+                        resetPlaceholders();
+                    })
                     .exceptionally(e -> {
                         onFailure.accept(e);
+                        resetPlaceholders();
                         return null;
                     });
                 break;
@@ -95,21 +103,26 @@ public class HellMessage {
      * @return A CompletableFuture that will be completed with the sent message.
      */
     public CompletableFuture<Message> send(@NonNull Messageable messageable) {
+        CompletableFuture<Message> futureMessage;
         switch (this.messageType) {
             case MESSAGE:
                 String processedMessage = placeholderContext != null ? placeholderContext.apply() : (String) this.value;
-                return new MessageBuilder()
+                futureMessage = new MessageBuilder()
                     .setContent(processedMessage)
                     .send(messageable);
+                break;
             case EMBED:
                 HellEmbedBuilder processedEmbed = placeholderContext != null ? applyEmbedBuilder((HellEmbedBuilder) this.value, placeholderContext) : (HellEmbedBuilder) this.value;
                 MessageBuilder messageBuilder = new MessageBuilder()
                     .setEmbed(processedEmbed.toEmbedBuilder());
                 addComponentsToMessageBuilder(messageBuilder, processedEmbed);
-                return messageBuilder.send(messageable);
+                futureMessage = messageBuilder.send(messageable);
+                break;
             default:
                 throw new OkaeriException("Cannot resolve unknown message-type: " + this.messageType);
         }
+        futureMessage.thenRun(this::resetPlaceholders);
+        return futureMessage;
     }
 
     /**
@@ -118,12 +131,9 @@ public class HellMessage {
      * @param responder The interaction responder.
      */
     public void applyToResponder(@NonNull InteractionImmediateResponseBuilder responder) {
-        if (placeholderContext == null) {
-            throw new OkaeriException("PlaceholderContext must be set before applying to responder.");
-        }
-
         Object processedValue = processValue();
         applyProcessedValueToResponder(responder, processedValue);
+        resetPlaceholders();
     }
 
     /**
@@ -151,6 +161,7 @@ public class HellMessage {
         this.placeholderContext = context;
         Object processedValue = processValue();
         applyProcessedValueToResponder(responder, processedValue);
+        resetPlaceholders();
     }
 
     /**
@@ -160,9 +171,9 @@ public class HellMessage {
      */
     private Object processValue() {
         if (this.messageType == HellMessageType.MESSAGE) {
-            return placeholderContext.apply();
+            return placeholderContext != null ? placeholderContext.apply() : this.value;
         } else if (this.messageType == HellMessageType.EMBED) {
-            return applyEmbedBuilder((HellEmbedBuilder) this.value, placeholderContext);
+            return placeholderContext != null ? applyEmbedBuilder((HellEmbedBuilder) this.value, placeholderContext) : this.value;
         } else {
             throw new OkaeriException("Cannot process unknown message-type: " + this.messageType);
         }
@@ -248,5 +259,12 @@ public class HellMessage {
         ));
 
         return fixedEmbedBuilder;
+    }
+
+    /**
+     * Resets the placeholder context.
+     */
+    private void resetPlaceholders() {
+        this.placeholderContext = null;
     }
 }

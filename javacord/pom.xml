@@ -9,8 +9,7 @@
         <version>0.4.31</version>
     </parent>
 
-    <groupId>me.night</groupId>
-    <artifactId>javacord</artifactId>
+    <artifactId>hell-javacord</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -112,10 +111,12 @@
 
     </dependencies>
 
-    <repository>
-        <id>okaeri-repo</id>
-        <url>https://storehouse.okaeri.eu/repository/maven-public/</url>
-    </repository>
+    <repositories>
+        <repository>
+            <id>okaeri-repo</id>
+            <url>https://storehouse.okaeri.eu/repository/maven-public/</url>
+        </repository>
+    </repositories>
 
 
 </project>

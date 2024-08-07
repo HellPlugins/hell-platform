@@ -25,7 +25,6 @@
 
         <!-- extensions -->
         <module>ext-scheduler-quartz</module>
-        <module>javacord</module>
     </modules>
 
     <properties>
@@ -115,16 +114,5 @@
             <url>https://storehouse.okaeri.eu/repository/maven-releases/</url>
         </repository>
     </repositories>
-
-<!--    <distributionManagement>-->
-<!--        <repository>-->
-<!--            <id>storehouse-releases</id>-->
-<!--            <url>https://storehouse.okaeri.eu/repository/maven-releases/</url>-->
-<!--        </repository>-->
-<!--        <snapshotRepository>-->
-<!--            <id>storehouse-snapshots</id>-->
-<!--            <url>https://storehouse.okaeri.eu/repository/maven-snapshots/</url>-->
-<!--        </snapshotRepository>-->
-<!--    </distributionManagement>-->
 
 </project>
