@@ -47,11 +47,11 @@ public class HellSelectMenuBuilderSerializer implements ObjectSerializer<HellSel
     @Override
     public HellSelectMenuBuilder deserialize(@NonNull DeserializationData data, @NonNull GenericsDeclaration generics) {
         ComponentType componentType = data.get("component-type", ComponentType.class);
-        String customID = data.get("custom-id", String.class);
 
-        HellSelectMenuBuilder builder = new HellSelectMenuBuilder(componentType, customID);
+        HellSelectMenuBuilder builder = new HellSelectMenuBuilder(componentType);
 
-        builder.setSelectMenuPlaceholder(data.get("placeholder", String.class));
+        builder.setCustomId(data.get("custom-id", String.class));
+        builder.setPlaceholder(data.get("placeholder", String.class));
         builder.setMinimumValues(data.get("min-values", Integer.class));
         builder.setMaximumValues(data.get("max-values", Integer.class));
         builder.setDisabled(data.get("disabled", Boolean.class));
@@ -61,7 +61,7 @@ public class HellSelectMenuBuilderSerializer implements ObjectSerializer<HellSel
             Iterable<ChannelType> channelTypes = channelTypeNames.stream()
                     .map(ChannelType::valueOf)
                     .collect(Collectors.toList());
-            builder.addSelectMenuChannelTypes(channelTypes);
+            builder.addChannelTypes(channelTypes);
         }
 
         if (data.containsKey("options")) {
