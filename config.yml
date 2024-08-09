@@ -1,0 +1,38 @@
+# testowy config
+test: testowyString
+# message
+message:
+  type: MESSAGE
+  value: testowy mesedz {test}
+# testMsg
+testtt:
+  type: MESSAGE
+  value: testowy mesedz bez placeholdera {test}
+# testembed
+embed:
+  type: EMBED
+  value:
+    embed-title: title {test}
+    embed-description: testDesctiption
+    embed-buttons:
+    - button-style: PRIMARY
+      button-customid: customId
+      button-label: fajny taki label
+      button-disabled: false
+# Storage settings
+storage:
+  # Type of the storage backend: FLAT, REDIS, MONGO, MYSQL, H2
+  backend: FLAT
+  # Prefix for the storage: allows to have multiple instances using same database
+  # FLAT   : no effect due to local nature
+  # REDIS  : {storagePrefix}:{collection} -> ope:player
+  # MONGO  : {storagePrefix}:{collection} -> ope_player
+  # MYSQL  : {storagePrefix}:{collection} -> ope_player
+  # H2     : {storagePrefix}:{collection} -> ope_player
+  prefix: ope
+  # FLAT   : ./storage
+  # REDIS  : redis://localhost
+  # MONGO  : mongodb://localhost:27017/db
+  # MYSQL  : jdbc:mysql://localhost:3306/db?user=root&password=1234
+  # H2     : jdbc:h2:file:./storage;mode=mysql
+  uri: ./storage

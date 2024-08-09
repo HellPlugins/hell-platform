@@ -8,6 +8,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.helldev.javacord.platform.message.embed.HellEmbedBuilder;
+import org.helldev.javacord.platform.message.embed.HellEmbedButtonBuilder;
+import org.helldev.javacord.platform.message.embed.HellSelectMenuBuilder;
 import org.helldev.javacord.platform.message.type.HellMessageType;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -17,13 +19,9 @@ import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-/**
- * Represents a message that can be sent to a Discord channel or user.
- */
 @Slf4j
 @Data
 @RequiredArgsConstructor
@@ -34,157 +32,83 @@ public class HellMessage {
     @NonNull
     private final Object value;
 
-    private PlaceholderContext placeholderContext;
+    private static PlaceholderContext placeholderContext;
 
-    /**
-     * Adds a placeholder value.
-     *
-     * @param key   The placeholder key.
-     * @param value The placeholder value.
-     * @return The HellMessage instance with the updated placeholder.
-     */
     public HellMessage with(@NonNull String key, @NonNull Object value) {
-        if (this.placeholderContext == null) {
-            this.placeholderContext = PlaceholderContext.of(CompiledMessage.of(this.value.toString()));
+        if (placeholderContext == null) {
+            placeholderContext = PlaceholderContext.create();
         }
-        this.placeholderContext.with(key, value);
+        placeholderContext.with(key, value);
         return this;
     }
 
-    /**
-     * Sends the message to a specified target.
-     *
-     * @param messageable The target to send the message to.
-     * @param onSuccess   Callback for successful sending.
-     * @param onFailure   Callback for failed sending.
-     */
-    public void send(@NonNull Messageable messageable, @NonNull Consumer<Message> onSuccess, @NonNull Consumer<Throwable> onFailure) {
-        switch (this.messageType) {
-            case MESSAGE:
-                String processedMessage = placeholderContext != null ? placeholderContext.apply() : (String) this.value;
-                new MessageBuilder()
-                    .setContent(processedMessage)
-                    .send(messageable)
-                    .thenAccept(message -> {
-                        onSuccess.accept(message);
-                        resetPlaceholders();
-                    })
-                    .exceptionally(e -> {
-                        onFailure.accept(e);
-                        resetPlaceholders();
-                        return null;
-                    });
-                break;
-            case EMBED:
-                HellEmbedBuilder processedEmbed = placeholderContext != null ? applyEmbedBuilder((HellEmbedBuilder) this.value, placeholderContext) : (HellEmbedBuilder) this.value;
-                MessageBuilder messageBuilder = new MessageBuilder()
-                    .setEmbed(processedEmbed.toEmbedBuilder());
-                addComponentsToMessageBuilder(messageBuilder, processedEmbed);
-                messageBuilder.send(messageable)
-                    .thenAccept(message -> {
-                        onSuccess.accept(message);
-                        resetPlaceholders();
-                    })
-                    .exceptionally(e -> {
-                        onFailure.accept(e);
-                        resetPlaceholders();
-                        return null;
-                    });
-                break;
-            default:
-                throw new OkaeriException("Cannot resolve unknown message-type: " + this.messageType);
-        }
+    public static String apply(String text) {
+        CompiledMessage compiledMessage = CompiledMessage.of(text);
+        return placeholderContext != null ? placeholderContext.apply(compiledMessage) : "";
     }
 
-    /**
-     * Sends the message to a specified target.
-     *
-     * @param messageable The target to send the message to.
-     * @return A CompletableFuture that will be completed with the sent message.
-     */
+    @SuppressWarnings("unused")
+    public void send(@NonNull Messageable messageable, @NonNull Consumer<Message> onSuccess, @NonNull Consumer<Throwable> onFailure) {
+        CompletableFuture<Message> futureMessage = createMessageFuture(messageable);
+        futureMessage
+            .thenAccept(message -> {
+                onSuccess.accept(message);
+                resetPlaceholders();
+            })
+            .exceptionally(e -> {
+                onFailure.accept(e);
+                resetPlaceholders();
+                return null;
+            });
+    }
+
     public CompletableFuture<Message> send(@NonNull Messageable messageable) {
-        CompletableFuture<Message> futureMessage;
-        switch (this.messageType) {
-            case MESSAGE:
-                String processedMessage = placeholderContext != null ? placeholderContext.apply() : (String) this.value;
-                futureMessage = new MessageBuilder()
-                    .setContent(processedMessage)
-                    .send(messageable);
-                break;
-            case EMBED:
-                HellEmbedBuilder processedEmbed = placeholderContext != null ? applyEmbedBuilder((HellEmbedBuilder) this.value, placeholderContext) : (HellEmbedBuilder) this.value;
-                MessageBuilder messageBuilder = new MessageBuilder()
-                    .setEmbed(processedEmbed.toEmbedBuilder());
-                addComponentsToMessageBuilder(messageBuilder, processedEmbed);
-                futureMessage = messageBuilder.send(messageable);
-                break;
-            default:
-                throw new OkaeriException("Cannot resolve unknown message-type: " + this.messageType);
-        }
+        CompletableFuture<Message> futureMessage = createMessageFuture(messageable);
         futureMessage.thenRun(this::resetPlaceholders);
         return futureMessage;
     }
 
-    /**
-     * Applies the message to an interaction responder.
-     *
-     * @param responder The interaction responder.
-     */
+    private CompletableFuture<Message> createMessageFuture(@NonNull Messageable messageable) {
+        switch (this.messageType) {
+            case MESSAGE:
+                String processedMessage = getProcessedMessage();
+                return new MessageBuilder().setContent(processedMessage).send(messageable);
+            case EMBED:
+                HellEmbedBuilder processedEmbed = getProcessedEmbed();
+                MessageBuilder messageBuilder = new MessageBuilder().setEmbed(processedEmbed.toEmbedBuilder());
+                addComponentsToMessageBuilder(messageBuilder, processedEmbed);
+                return messageBuilder.send(messageable);
+            default:
+                throw new OkaeriException("Unknown message type: " + this.messageType);
+        }
+    }
+
     public void applyToResponder(@NonNull InteractionImmediateResponseBuilder responder) {
-        Object processedValue = processValue();
-        applyProcessedValueToResponder(responder, processedValue);
-        resetPlaceholders();
+        applyToResponder(responder, placeholderContext);
     }
 
-    /**
-     * Adds components (buttons or select menus) to the message builder.
-     *
-     * @param messageBuilder   The message builder.
-     * @param hellEmbedBuilder The embed builder.
-     */
-    private void addComponentsToMessageBuilder(MessageBuilder messageBuilder, HellEmbedBuilder hellEmbedBuilder) {
-        if (!hellEmbedBuilder.getButtons().isEmpty() && !hellEmbedBuilder.getSelectMenus().isEmpty()) {
-            throw new IllegalStateException("Cannot have both buttons and select menus in the same message.");
-        }
-        List<ActionRow> actionRows = new ArrayList<>();
-        hellEmbedBuilder.getButtons().forEach(button -> actionRows.add(ActionRow.of(button.toButtonBuilder().build())));
-        hellEmbedBuilder.getSelectMenus().forEach(selectMenu -> actionRows.add(ActionRow.of(selectMenu.getSelectMenuBuilder().build())));
-        actionRows.forEach(messageBuilder::addComponents);
-    }
-
-    /**
-     * Applies the message to an interaction responder with a placeholder context.
-     *
-     * @param responder The interaction responder.
-     */
     public void applyToResponder(@NonNull InteractionImmediateResponseBuilder responder, @NonNull PlaceholderContext context) {
-        this.placeholderContext = context;
+        placeholderContext = context;
         Object processedValue = processValue();
         applyProcessedValueToResponder(responder, processedValue);
         resetPlaceholders();
     }
 
-    /**
-     * Processes the value based on the placeholder context.
-     *
-     * @return The processed value.
-     */
-    private Object processValue() {
-        if (this.messageType == HellMessageType.MESSAGE) {
-            return placeholderContext != null ? placeholderContext.apply() : this.value;
-        } else if (this.messageType == HellMessageType.EMBED) {
-            return placeholderContext != null ? applyEmbedBuilder((HellEmbedBuilder) this.value, placeholderContext) : this.value;
-        } else {
-            throw new OkaeriException("Cannot process unknown message-type: " + this.messageType);
-        }
+    private String getProcessedMessage() {
+        return placeholderContext != null ? placeholderContext.apply() : (String) this.value;
     }
 
-    /**
-     * Applies processed value to the responder.
-     *
-     * @param responder       The interaction responder.
-     * @param processedValue The processed value.
-     */
+    private HellEmbedBuilder getProcessedEmbed() {
+        return placeholderContext != null ? applyEmbedBuilder((HellEmbedBuilder) this.value) : (HellEmbedBuilder) this.value;
+    }
+
+    private Object processValue() {
+        return switch (this.messageType) {
+            case MESSAGE -> getProcessedMessage();
+            case EMBED -> getProcessedEmbed();
+        };
+    }
+
     private void applyProcessedValueToResponder(@NonNull InteractionImmediateResponseBuilder responder, @NonNull Object processedValue) {
         switch (this.messageType) {
             case MESSAGE:
@@ -196,75 +120,76 @@ public class HellMessage {
                 addComponentsToResponder(responder, hellEmbedBuilder);
                 break;
             default:
-                throw new OkaeriException("Cannot resolve unknown message-type: " + this.messageType);
+                throw new OkaeriException("Unknown message type: " + this.messageType);
         }
     }
 
-    /**
-     * Adds components (buttons or select menus) to the interaction responder.
-     *
-     * @param responder        The interaction responder.
-     * @param hellEmbedBuilder The embed builder.
-     */
+    private void addComponentsToMessageBuilder(MessageBuilder messageBuilder, HellEmbedBuilder hellEmbedBuilder) {
+        List<ActionRow> actionRows = new ArrayList<>();
+        hellEmbedBuilder.getButtons().forEach(button -> actionRows.add(ActionRow.of(button.toButtonBuilder().build())));
+        hellEmbedBuilder.getSelectMenus().forEach(selectMenu -> actionRows.add(ActionRow.of(selectMenu.getSelectMenuBuilder().build())));
+        actionRows.forEach(messageBuilder::addComponents);
+    }
+
     private void addComponentsToResponder(InteractionImmediateResponseBuilder responder, HellEmbedBuilder hellEmbedBuilder) {
-        if (!hellEmbedBuilder.getButtons().isEmpty() && !hellEmbedBuilder.getSelectMenus().isEmpty()) {
-            throw new IllegalStateException("Cannot have both buttons and select menus in the same message.");
-        }
         List<ActionRow> actionRows = new ArrayList<>();
         hellEmbedBuilder.getButtons().forEach(button -> actionRows.add(ActionRow.of(button.toButtonBuilder().build())));
         hellEmbedBuilder.getSelectMenus().forEach(selectMenu -> actionRows.add(ActionRow.of(selectMenu.getSelectMenuBuilder().build())));
         actionRows.forEach(responder::addComponents);
     }
 
-    /**
-     * Applies placeholders to an embed builder.
-     *
-     * @param from               The original embed builder.
-     * @param placeholderContext The placeholder context.
-     * @return The processed embed builder.
-     */
-    public static HellEmbedBuilder applyEmbedBuilder(@NonNull HellEmbedBuilder from, @NonNull PlaceholderContext placeholderContext) {
+    public static HellEmbedBuilder applyEmbedBuilder(@NonNull HellEmbedBuilder from) {
         HellEmbedBuilder fixedEmbedBuilder = new HellEmbedBuilder();
 
-        Optional.ofNullable(from.getTitle()).ifPresent(title -> fixedEmbedBuilder.setTitle(placeholderContext.with("title", title).apply()));
-        Optional.ofNullable(from.getDescription()).ifPresent(description -> fixedEmbedBuilder.setDescription(placeholderContext.with("description", description).apply()));
-        Optional.ofNullable(from.getUrl()).ifPresent(url -> fixedEmbedBuilder.setUrl(placeholderContext.with("url", url).apply()));
-
+        if (from.getTitle() != null) fixedEmbedBuilder.setTitle(apply(from.getTitle()));
+        if (from.getDescription() != null) fixedEmbedBuilder.setDescription(apply(from.getDescription()));
+        if (from.getUrl() != null) fixedEmbedBuilder.setUrl(apply(from.getUrl()));
         if (from.getFooterText() != null) {
             if (from.getFooterIconUrl() != null) {
-                fixedEmbedBuilder.setFooter(
-                    placeholderContext.with("footerText", from.getFooterText()).apply(),
-                    placeholderContext.with("footerIconUrl", from.getFooterIconUrl()).apply()
-                );
+                fixedEmbedBuilder.setFooter(apply(from.getFooterText()), apply(from.getFooterIconUrl()));
             } else {
-                fixedEmbedBuilder.setFooter(placeholderContext.with("footerText", from.getFooterText()).apply());
+                fixedEmbedBuilder.setFooter(apply(from.getFooterText()));
             }
         }
-
-        Optional.ofNullable(from.getImageUrl()).ifPresent(imageUrl -> fixedEmbedBuilder.setImage(placeholderContext.with("imageUrl", imageUrl).apply()));
-        Optional.ofNullable(from.getThumbnailUrl()).ifPresent(thumbnailUrl -> fixedEmbedBuilder.setThumbnail(placeholderContext.with("thumbnailUrl", thumbnailUrl).apply()));
-
+        if (from.getImageUrl() != null) fixedEmbedBuilder.setImage(apply(from.getImageUrl()));
         if (from.getAuthorName() != null) {
             fixedEmbedBuilder.setAuthor(
-                placeholderContext.with("authorName", from.getAuthorName()).apply(),
-                placeholderContext.with("authorUrl", from.getAuthorUrl()).apply(),
-                placeholderContext.with("authorIconUrl", from.getAuthorIconUrl()).apply()
+                apply(from.getAuthorName()),
+                apply(from.getAuthorUrl()),
+                apply(from.getAuthorIconUrl())
             );
         }
+        if (from.getColor() != null) fixedEmbedBuilder.setColor(from.getColor());
+        if (from.getThumbnailUrl() != null) fixedEmbedBuilder.setThumbnail(apply(from.getThumbnailUrl()));
 
         from.getFields().forEach(field -> fixedEmbedBuilder.addField(
-            placeholderContext.with("fieldName", field.getName()).apply(),
-            placeholderContext.with("fieldValue", field.getValue()).apply(),
+            apply(field.getName()),
+            apply(field.getValue()),
             field.isInline()
         ));
+
+        from.getButtons().forEach(buttonBuilder -> {
+            String processedCustomId = apply(buttonBuilder.getCustomId());
+            String processedLabel = apply(buttonBuilder.getLabel());
+
+            HellEmbedButtonBuilder newButtonBuilder = new HellEmbedButtonBuilder()
+                .setButtonStyle(buttonBuilder.getButtonStyle())
+                .setCustomId(processedCustomId)
+                .setLabel(processedLabel)
+                .setUrl(buttonBuilder.getUrl())
+                .setDisabled(buttonBuilder.isDisabled())
+                .setEmoji(buttonBuilder.getEmoji());
+
+            fixedEmbedBuilder.addButton(newButtonBuilder);
+        });
+
+        from.getSelectMenus().forEach(fixedEmbedBuilder::addSelectMenu);
 
         return fixedEmbedBuilder;
     }
 
-    /**
-     * Resets the placeholder context.
-     */
+
     private void resetPlaceholders() {
-        this.placeholderContext = null;
+        placeholderContext = null;
     }
 }

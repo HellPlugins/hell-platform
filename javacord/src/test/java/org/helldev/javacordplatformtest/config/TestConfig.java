@@ -8,8 +8,11 @@ import eu.okaeri.platform.core.annotation.Configuration;
 import lombok.Getter;
 import lombok.Setter;
 import org.helldev.javacord.platform.message.HellMessage;
+import org.helldev.javacord.platform.message.embed.HellEmbedBuilder;
+import org.helldev.javacord.platform.message.embed.HellEmbedButtonBuilder;
 import org.helldev.javacord.platform.message.serializer.HellMessageSerdes;
 import org.helldev.javacord.platform.message.type.HellMessageType;
+import org.javacord.api.entity.message.component.ButtonStyle;
 
 @Configuration(path = "config.yml")
 @Getter
@@ -24,6 +27,18 @@ public class TestConfig extends OkaeriConfig {
 
     @Comment("testMsg")
     public HellMessage testtt = new HellMessage(HellMessageType.MESSAGE, "testowy mesedz bez placeholdera {test}");
+
+    @Comment("testembed")
+    public HellMessage embed = new HellMessage(HellMessageType.EMBED, new HellEmbedBuilder()
+        .setTitle("title")
+        .setDescription("testDesctiption")
+        .addButton(
+            new HellEmbedButtonBuilder()
+                .setButtonStyle(ButtonStyle.PRIMARY)
+                .setCustomId("customId")
+                .setLabel("fajny taki label")
+
+        ));
 
 
     @Comment("Storage settings")
