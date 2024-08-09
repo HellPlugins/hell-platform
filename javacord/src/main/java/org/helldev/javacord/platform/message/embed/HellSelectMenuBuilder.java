@@ -47,7 +47,7 @@ public class HellSelectMenuBuilder {
      * @param placeholder The placeholder text.
      * @return The updated HellSelectMenuBuilder object.
      */
-    public HellSelectMenuBuilder setSelectMenuPlaceholder(String placeholder) {
+    public HellSelectMenuBuilder setPlaceholder(String placeholder) {
         selectMenuBuilder.setPlaceholder(placeholder);
         this.selectMenuPlaceHolder = placeholder;
         return this;
@@ -59,7 +59,7 @@ public class HellSelectMenuBuilder {
      * @param minimumValues The minimum number of selectable values.
      * @return The updated HellSelectMenuBuilder object.
      */
-    public HellSelectMenuBuilder setSelectMenuMinimumValues(int minimumValues) {
+    public HellSelectMenuBuilder setMinimumValues(int minimumValues) {
         selectMenuBuilder.setMinimumValues(minimumValues);
         this.selectMenuMinimumValues = minimumValues;
         return this;
@@ -71,7 +71,7 @@ public class HellSelectMenuBuilder {
      * @param maximumValues The maximum number of selectable values.
      * @return The updated HellSelectMenuBuilder object.
      */
-    public HellSelectMenuBuilder setSelectMenuMaximumValues(int maximumValues) {
+    public HellSelectMenuBuilder setMaximumValues(int maximumValues) {
         selectMenuBuilder.setMaximumValues(maximumValues);
         this.selectMenuMaximumValues = maximumValues;
         return this;
@@ -83,7 +83,7 @@ public class HellSelectMenuBuilder {
      * @param channelTypes The channel types to add.
      * @return The updated HellSelectMenuBuilder object.
      */
-    public HellSelectMenuBuilder addSelectMenuChannelTypes(Iterable<ChannelType> channelTypes) {
+    public HellSelectMenuBuilder addChannelTypes(Iterable<ChannelType> channelTypes) {
         selectMenuBuilder.addChannelTypes(channelTypes);
         this.selectMenuChannelTypes = channelTypes;
         return this;
