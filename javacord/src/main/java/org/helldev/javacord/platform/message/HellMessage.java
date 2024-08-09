@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.helldev.javacord.platform.message.embed.HellEmbedBuilder;
 import org.helldev.javacord.platform.message.embed.HellEmbedButtonBuilder;
 import org.helldev.javacord.platform.message.embed.HellSelectMenuBuilder;
+import org.helldev.javacord.platform.message.embed.HellSelectOptionBuilder;
 import org.helldev.javacord.platform.message.type.HellMessageType;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -169,6 +170,7 @@ public class HellMessage {
         ));
 
         from.getButtons().forEach(buttonBuilder -> {
+            // Apply placeholders to customId and label
             String processedCustomId = apply(buttonBuilder.getCustomId());
             String processedLabel = apply(buttonBuilder.getLabel());
 
@@ -183,10 +185,25 @@ public class HellMessage {
             fixedEmbedBuilder.addButton(newButtonBuilder);
         });
 
-        from.getSelectMenus().forEach(fixedEmbedBuilder::addSelectMenu);
+        from.getSelectMenus().forEach(selectMenuBuilder -> {
+            String processedCustomId = apply(selectMenuBuilder.getCustomId());
+            String processedPlaceholder = apply(selectMenuBuilder.getPlaceHolder());
+
+            HellSelectMenuBuilder newSelectMenuBuilder = new HellSelectMenuBuilder(selectMenuBuilder.getComponentType())
+                .setCustomId(processedCustomId)
+                .setPlaceholder(processedPlaceholder)
+                .setMinimumValues(selectMenuBuilder.getMinimumValues())
+                .setMaximumValues(selectMenuBuilder.getMaximumValues())
+                .addChannelTypes(selectMenuBuilder.getChannelTypes())
+                .setDisabled(selectMenuBuilder.isDisabled());
+
+
+            fixedEmbedBuilder.addSelectMenu(newSelectMenuBuilder);
+        });
 
         return fixedEmbedBuilder;
     }
+
 
 
     private void resetPlaceholders() {

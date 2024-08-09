@@ -26,14 +26,14 @@ public class HellSelectMenuBuilderSerializer implements ObjectSerializer<HellSel
     @Override
     public void serialize(@NonNull HellSelectMenuBuilder object, @NonNull SerializationData data, @NonNull GenericsDeclaration generics) {
         addIfNotNull(data, "component-type", object.getSelectMenuComponentType());
-        addIfNotNull(data, "custom-id", object.getSelectMenuCustomId());
-        addIfNotNull(data, "placeholder", object.getSelectMenuPlaceHolder());
-        addIfNotNull(data, "min-values", object.getSelectMenuMinimumValues());
-        addIfNotNull(data, "max-values", object.getSelectMenuMaximumValues());
+        addIfNotNull(data, "custom-id", object.getCustomId());
+        addIfNotNull(data, "placeholder", object.getPlaceHolder());
+        addIfNotNull(data, "min-values", object.getMinimumValues());
+        addIfNotNull(data, "max-values", object.getMaximumValues());
         addIfNotNull(data, "disabled", object.isDisabled());
 
-        if (object.getSelectMenuChannelTypes() != null) {
-            List<String> channelTypeNames = StreamSupport.stream(object.getSelectMenuChannelTypes().spliterator(), false)
+        if (object.getChannelTypes() != null) {
+            List<String> channelTypeNames = StreamSupport.stream(object.getChannelTypes().spliterator(), false)
                     .map(ChannelType::name)
                     .collect(Collectors.toList());
             data.add("channel-types", channelTypeNames);
@@ -52,8 +52,8 @@ public class HellSelectMenuBuilderSerializer implements ObjectSerializer<HellSel
         HellSelectMenuBuilder builder = new HellSelectMenuBuilder(componentType, customID);
 
         builder.setSelectMenuPlaceholder(data.get("placeholder", String.class));
-        builder.setSelectMenuMinimumValues(data.get("min-values", Integer.class));
-        builder.setSelectMenuMaximumValues(data.get("max-values", Integer.class));
+        builder.setMinimumValues(data.get("min-values", Integer.class));
+        builder.setMaximumValues(data.get("max-values", Integer.class));
         builder.setDisabled(data.get("disabled", Boolean.class));
 
         if (data.containsKey("channel-types")) {

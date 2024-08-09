@@ -22,23 +22,28 @@ public class HellSelectMenuBuilder {
     private final List<HellSelectOptionBuilder> options = new ArrayList<>();
 
     private ComponentType selectMenuComponentType = null;
-    private String selectMenuCustomId = null;
-    private String selectMenuPlaceHolder = null;
-    private int selectMenuMinimumValues = 1;
-    private int selectMenuMaximumValues = 3;
-    private Iterable<ChannelType> selectMenuChannelTypes = null;
+    private ComponentType componentType;
+    private String customId = null;
+    private String placeHolder = null;
+    private int minimumValues = 1;
+    private int maximumValues = 3;
+    private Iterable<ChannelType> channelTypes = null;
     private boolean disabled = false;
 
     /**
      * Constructor to initialize the select menu with component type and custom ID.
      *
      * @param componentType The type of the component.
-     * @param customId The custom ID for the select menu.
      */
-    public HellSelectMenuBuilder(ComponentType componentType, String customId) {
-        this.selectMenuBuilder = new SelectMenuBuilder(componentType, customId);
+    public HellSelectMenuBuilder(ComponentType componentType) {
+        this.selectMenuBuilder = new SelectMenuBuilder(componentType, null);
         this.selectMenuComponentType = componentType;
-        this.selectMenuCustomId = customId;
+    }
+
+    public HellSelectMenuBuilder setCustomId(String customId) {
+        this.selectMenuBuilder.setCustomId(customId);
+        this.customId = customId;
+        return this;
     }
 
     /**
@@ -49,7 +54,7 @@ public class HellSelectMenuBuilder {
      */
     public HellSelectMenuBuilder setPlaceholder(String placeholder) {
         selectMenuBuilder.setPlaceholder(placeholder);
-        this.selectMenuPlaceHolder = placeholder;
+        this.placeHolder = placeholder;
         return this;
     }
 
@@ -61,7 +66,7 @@ public class HellSelectMenuBuilder {
      */
     public HellSelectMenuBuilder setMinimumValues(int minimumValues) {
         selectMenuBuilder.setMinimumValues(minimumValues);
-        this.selectMenuMinimumValues = minimumValues;
+        this.minimumValues = minimumValues;
         return this;
     }
 
@@ -73,7 +78,7 @@ public class HellSelectMenuBuilder {
      */
     public HellSelectMenuBuilder setMaximumValues(int maximumValues) {
         selectMenuBuilder.setMaximumValues(maximumValues);
-        this.selectMenuMaximumValues = maximumValues;
+        this.maximumValues = maximumValues;
         return this;
     }
 
@@ -85,7 +90,7 @@ public class HellSelectMenuBuilder {
      */
     public HellSelectMenuBuilder addChannelTypes(Iterable<ChannelType> channelTypes) {
         selectMenuBuilder.addChannelTypes(channelTypes);
-        this.selectMenuChannelTypes = channelTypes;
+        this.channelTypes = channelTypes;
         return this;
     }
 
@@ -173,11 +178,11 @@ public class HellSelectMenuBuilder {
     public HellSelectMenuBuilder copy(HellSelectMenuBuilder hellSelectMenuBuilder) {
         selectMenuBuilder.copy(hellSelectMenuBuilder.selectMenuBuilder.build());
         this.selectMenuComponentType = hellSelectMenuBuilder.selectMenuComponentType;
-        this.selectMenuCustomId = hellSelectMenuBuilder.selectMenuCustomId;
-        this.selectMenuPlaceHolder = hellSelectMenuBuilder.selectMenuPlaceHolder;
-        this.selectMenuMinimumValues = hellSelectMenuBuilder.selectMenuMinimumValues;
-        this.selectMenuMaximumValues = hellSelectMenuBuilder.selectMenuMaximumValues;
-        this.selectMenuChannelTypes = hellSelectMenuBuilder.selectMenuChannelTypes;
+        this.customId = hellSelectMenuBuilder.customId;
+        this.placeHolder = hellSelectMenuBuilder.placeHolder;
+        this.minimumValues = hellSelectMenuBuilder.minimumValues;
+        this.maximumValues = hellSelectMenuBuilder.maximumValues;
+        this.channelTypes = hellSelectMenuBuilder.channelTypes;
         this.disabled = hellSelectMenuBuilder.disabled;
         this.options.clear();
         this.options.addAll(hellSelectMenuBuilder.options);
