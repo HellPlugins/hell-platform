@@ -29,10 +29,15 @@ public class HellSelectOptionBuilderSerializer implements ObjectSerializer<HellS
 
     @Override
     public HellSelectOptionBuilder deserialize(@NonNull DeserializationData data, @NonNull GenericsDeclaration generics) {
-        String value = data.get("value", String.class);
-        String label = data.get("label", String.class);
+        HellSelectOptionBuilder builder = new HellSelectOptionBuilder();
 
-        HellSelectOptionBuilder builder = new HellSelectOptionBuilder(value, label);
+        if (data.containsKey("value")) {
+            builder.setValue(data.get("value", String.class));
+        }
+
+        if (data.containsKey("label")) {
+            builder.setLabel(data.get("label", String.class));
+        }
 
         if (data.containsKey("description")) {
             builder.setDescription(data.get("description", String.class));
