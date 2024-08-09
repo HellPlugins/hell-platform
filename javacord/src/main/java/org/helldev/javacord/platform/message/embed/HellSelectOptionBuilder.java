@@ -11,17 +11,27 @@ public class HellSelectOptionBuilder {
 
     private SelectMenuOptionBuilder selectMenuOptionBuilder;
 
-    private String label;
-    private String value;
+    private String label = null;
+    private String value = null;
     private String description = null;
     private String emojiAsUnicode = null;
     private Emoji emoji = null;
     private boolean defaultOption = false;
 
-    public HellSelectOptionBuilder(String value, String label) {
-        selectMenuOptionBuilder = new SelectMenuOptionBuilder().setValue(value).setLabel(label);
-        this.label = label;
+    public HellSelectOptionBuilder() {
+        selectMenuOptionBuilder = new SelectMenuOptionBuilder();
+    }
+
+    public HellSelectOptionBuilder setValue(String value) {
+        selectMenuOptionBuilder.setValue(value);
         this.value = value;
+        return this;
+    }
+
+    public HellSelectOptionBuilder setLabel(String label) {
+        selectMenuOptionBuilder.setLabel(label);
+        this.label = label;
+        return this;
     }
 
     public HellSelectOptionBuilder setDescription(String description) {
