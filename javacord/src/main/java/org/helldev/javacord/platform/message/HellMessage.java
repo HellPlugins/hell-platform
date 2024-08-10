@@ -198,7 +198,6 @@ public class HellMessage {
 
                 if (selectOptionBuilder.isDefaultOption()) newSelectOptionBuilder.setDefault(true);
                 if (selectOptionBuilder.getDescription() != null) newSelectOptionBuilder.setDescription(apply(selectOptionBuilder.getDescription()));
-                System.out.println("emoji " + selectOptionBuilder.getEmojiAsUnicode());
                 if (selectOptionBuilder.getEmojiAsUnicode() != null) newSelectOptionBuilder.setEmoji(selectOptionBuilder.getEmojiAsUnicode());
                 if (selectOptionBuilder.getEmoji() != null) newSelectOptionBuilder.setEmoji(selectOptionBuilder.getEmoji());
 
