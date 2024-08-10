@@ -7,6 +7,7 @@ import eu.okaeri.platform.core.plan.ExecutionTask;
 import lombok.RequiredArgsConstructor;
 import org.helldev.javacord.platform.HellBotBase;
 import org.helldev.javacord.platform.annotations.SetAllIntents;
+import org.helldev.javacord.platform.annotations.SetIntents;
 import org.helldev.javacord.platform.annotations.Token;
 import org.helldev.javacord.platform.config.DefaultTokenConfig;
 import org.javacord.api.DiscordApi;
@@ -21,6 +22,7 @@ public class BotSetupTask implements ExecutionTask<HellBotBase> {
     public void execute(HellBotBase platform) {
         Token discordToken = platform.getClass().getAnnotation(Token.class);
         SetAllIntents setAllIntents = platform.getClass().getAnnotation(SetAllIntents.class);
+        SetIntents setIntents = platform.getClass().getAnnotation(SetIntents.class);
         String token;
 
         if (discordToken != null) {
@@ -42,6 +44,10 @@ public class BotSetupTask implements ExecutionTask<HellBotBase> {
         }
         DiscordApiBuilder discordApiBuilder = new DiscordApiBuilder()
             .setToken(token);
+
+        if (setIntents != null) {
+            discordApiBuilder.setIntents(setIntents.value());
+        }
 
         if (setAllIntents != null) {
             discordApiBuilder.setAllIntents();
