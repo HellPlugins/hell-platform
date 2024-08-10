@@ -32,8 +32,8 @@ import java.io.File;
 
 
 @Scan(value = "org.helldev.javacordplatformtest", deep = true)
-@SetAllIntents
-//@SetIntents({Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_REACTIONS})
+//@SetAllIntents
+@SetIntents({Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_REACTIONS})
 public class BotTest extends HellBotBase {
 
     public static void main(String[] args) {

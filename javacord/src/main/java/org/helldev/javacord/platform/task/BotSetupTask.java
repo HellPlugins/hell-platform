@@ -14,6 +14,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
 import java.io.File;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class BotSetupTask implements ExecutionTask<HellBotBase> {
@@ -47,10 +48,13 @@ public class BotSetupTask implements ExecutionTask<HellBotBase> {
 
         if (setIntents != null) {
             discordApiBuilder.setIntents(setIntents.value());
+            platform.getLogger().info("Intents: " + Arrays.toString(setIntents.value()));
+
         }
 
         if (setAllIntents != null) {
             discordApiBuilder.setAllIntents();
+            platform.getLogger().info("Intents: ALL");
         }
 
         DiscordApi discordApi = discordApiBuilder
@@ -59,6 +63,8 @@ public class BotSetupTask implements ExecutionTask<HellBotBase> {
                 if (throwable != null) {
                     throw new OkaeriException("Exception while logging in to Discord", throwable);
                 }
+
+                platform.getLogger().info("Logged in as: " + api.getYourself().getDiscriminatedName());
             })
             .join();
 
