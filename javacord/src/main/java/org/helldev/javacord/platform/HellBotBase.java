@@ -42,8 +42,6 @@ import static eu.okaeri.platform.core.plan.ExecutionPhase.*;
 
 public class HellBotBase implements OkaeriPlatform {
 
-    //TODO: SetAllIntents and SetIntents annotations
-
     private final @Getter Logger logger = LoggerFactory.getLogger(this.getClass());
     private final @Getter File dataFolder = new File(".");
     private final @Getter File file = ComponentHelper.getJarFile(HellBotBase.class);
