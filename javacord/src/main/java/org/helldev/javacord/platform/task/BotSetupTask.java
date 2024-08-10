@@ -6,6 +6,7 @@ import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import eu.okaeri.platform.core.plan.ExecutionTask;
 import lombok.RequiredArgsConstructor;
 import org.helldev.javacord.platform.HellBotBase;
+import org.helldev.javacord.platform.annotations.SetAllIntents;
 import org.helldev.javacord.platform.annotations.Token;
 import org.helldev.javacord.platform.config.DefaultTokenConfig;
 import org.javacord.api.DiscordApi;
@@ -19,6 +20,7 @@ public class BotSetupTask implements ExecutionTask<HellBotBase> {
     @Override
     public void execute(HellBotBase platform) {
         Token discordToken = platform.getClass().getAnnotation(Token.class);
+        SetAllIntents setAllIntents = platform.getClass().getAnnotation(SetAllIntents.class);
         String token;
 
         if (discordToken != null) {
@@ -38,10 +40,14 @@ public class BotSetupTask implements ExecutionTask<HellBotBase> {
                 throw new OkaeriException("Token is missing and no valid configuration found. Check for token.yml.");
             }
         }
+        DiscordApiBuilder discordApiBuilder = new DiscordApiBuilder()
+            .setToken(token);
 
-        DiscordApi discordApi = new DiscordApiBuilder()
-            .setToken(token)
-            .setAllIntents()
+        if (setAllIntents != null) {
+            discordApiBuilder.setAllIntents();
+        }
+
+        DiscordApi discordApi = discordApiBuilder
             .login()
             .whenComplete((api, throwable) -> {
                 if (throwable != null) {
