@@ -21,14 +21,19 @@ import eu.okaeri.platform.core.plan.Planned;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import org.helldev.javacord.platform.HellBotBase;
+import org.helldev.javacord.platform.annotations.SetAllIntents;
+import org.helldev.javacord.platform.annotations.SetIntents;
 import org.helldev.javacord.platform.serializer.SerdesJavacord;
 import org.helldev.javacordplatformtest.config.TestConfig;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.intent.Intent;
 
 import java.io.File;
 
 
 @Scan(value = "org.helldev.javacordplatformtest", deep = true)
+@SetAllIntents
+//@SetIntents({Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_REACTIONS})
 public class BotTest extends HellBotBase {
 
     public static void main(String[] args) {
