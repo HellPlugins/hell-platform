@@ -25,7 +25,7 @@ public class HellSelectMenuBuilderSerializer implements ObjectSerializer<HellSel
 
     @Override
     public void serialize(@NonNull HellSelectMenuBuilder object, @NonNull SerializationData data, @NonNull GenericsDeclaration generics) {
-        addIfNotNull(data, "component-type", object.getSelectMenuComponentType());
+        addIfNotNull(data, "component-type", object.getComponentType());
         addIfNotNull(data, "custom-id", object.getCustomId());
         addIfNotNull(data, "placeholder", object.getPlaceHolder());
         addIfNotNull(data, "min-values", object.getMinimumValues());

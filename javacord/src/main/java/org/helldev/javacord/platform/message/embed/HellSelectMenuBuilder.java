@@ -21,13 +21,12 @@ public class HellSelectMenuBuilder {
     private final SelectMenuBuilder selectMenuBuilder;
     private final List<HellSelectOptionBuilder> options = new ArrayList<>();
 
-    private ComponentType selectMenuComponentType = null;
-    private ComponentType componentType;
+    private ComponentType componentType = null;
     private String customId = null;
     private String placeHolder = null;
     private int minimumValues = 1;
     private int maximumValues = 3;
-    private Iterable<ChannelType> channelTypes = null;
+    private Iterable<ChannelType> channelTypes;
     private boolean disabled = false;
 
     /**
@@ -37,7 +36,7 @@ public class HellSelectMenuBuilder {
      */
     public HellSelectMenuBuilder(ComponentType componentType) {
         this.selectMenuBuilder = new SelectMenuBuilder(componentType, null);
-        this.selectMenuComponentType = componentType;
+        this.componentType = componentType;
     }
 
     public HellSelectMenuBuilder setCustomId(String customId) {
@@ -177,7 +176,7 @@ public class HellSelectMenuBuilder {
      */
     public HellSelectMenuBuilder copy(HellSelectMenuBuilder hellSelectMenuBuilder) {
         selectMenuBuilder.copy(hellSelectMenuBuilder.selectMenuBuilder.build());
-        this.selectMenuComponentType = hellSelectMenuBuilder.selectMenuComponentType;
+        this.componentType = hellSelectMenuBuilder.componentType;
         this.customId = hellSelectMenuBuilder.customId;
         this.placeHolder = hellSelectMenuBuilder.placeHolder;
         this.minimumValues = hellSelectMenuBuilder.minimumValues;

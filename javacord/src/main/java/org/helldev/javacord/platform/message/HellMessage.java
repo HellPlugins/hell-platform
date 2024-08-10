@@ -33,7 +33,7 @@ public class HellMessage {
     @NonNull
     private final Object value;
 
-    private static PlaceholderContext placeholderContext;
+    private static PlaceholderContext placeholderContext = null;
 
     public HellMessage with(@NonNull String key, @NonNull Object value) {
         if (placeholderContext == null) {
@@ -96,7 +96,7 @@ public class HellMessage {
     }
 
     private String getProcessedMessage() {
-        return placeholderContext != null ? placeholderContext.apply() : (String) this.value;
+        return placeholderContext != null ? apply((String) this.value) : (String) this.value;
     }
 
     private HellEmbedBuilder getProcessedEmbed() {
@@ -171,35 +171,33 @@ public class HellMessage {
 
         from.getButtons().forEach(buttonBuilder -> {
 
-            HellEmbedButtonBuilder newButtonBuilder = new HellEmbedButtonBuilder()
-                .setButtonStyle(buttonBuilder.getButtonStyle())
-                .setCustomId(apply(buttonBuilder.getCustomId()))
-                .setLabel(apply(buttonBuilder.getLabel()))
-                .setUrl(buttonBuilder.getUrl())
-                .setDisabled(buttonBuilder.isDisabled())
-                .setEmoji(buttonBuilder.getEmoji());
+            HellEmbedButtonBuilder newButtonBuilder = new HellEmbedButtonBuilder().setButtonStyle(buttonBuilder.getButtonStyle()).setCustomId(apply(buttonBuilder.getCustomId())).setLabel(apply(buttonBuilder.getLabel()));
+
+            if (buttonBuilder.getUrl() != null) newButtonBuilder.setUrl(buttonBuilder.getUrl());
+            if (buttonBuilder.isDisabled()) newButtonBuilder.setDisabled(true);
+            if (buttonBuilder.getEmoji() != null) newButtonBuilder.setEmoji(buttonBuilder.getEmoji());
 
             fixedEmbedBuilder.addButton(newButtonBuilder);
         });
 
         from.getSelectMenus().forEach(selectMenuBuilder -> {
 
-            HellSelectMenuBuilder newSelectMenuBuilder = new HellSelectMenuBuilder(selectMenuBuilder.getComponentType())
-                .setCustomId(apply(selectMenuBuilder.getCustomId()))
-                .setPlaceholder(apply(selectMenuBuilder.getPlaceHolder()))
-                .setMinimumValues(selectMenuBuilder.getMinimumValues())
-                .setMaximumValues(selectMenuBuilder.getMaximumValues())
-                .addChannelTypes(selectMenuBuilder.getChannelTypes())
-                .setDisabled(selectMenuBuilder.isDisabled());
+            HellSelectMenuBuilder newSelectMenuBuilder = new HellSelectMenuBuilder(selectMenuBuilder.getComponentType()).setCustomId(apply(selectMenuBuilder.getCustomId())).setPlaceholder(apply(selectMenuBuilder.getPlaceHolder()));
 
-            selectMenuBuilder.getOptions().forEach(option -> {
-                HellSelectOptionBuilder processedOption = new HellSelectOptionBuilder()
-                    .setLabel(apply(option.getLabel()))
-                    .setValue(apply(option.getValue()))
-                    .setDescription(apply(option.getDescription()))
-                    .setEmoji(option.getEmoji());
+            if (selectMenuBuilder.getMinimumValues() != 1) newSelectMenuBuilder.setMinimumValues(selectMenuBuilder.getMinimumValues());
+            if (selectMenuBuilder.getMaximumValues() != 3) newSelectMenuBuilder.setMaximumValues(selectMenuBuilder.getMaximumValues());
+            if (selectMenuBuilder.getChannelTypes() != null) newSelectMenuBuilder.setChannelTypes(selectMenuBuilder.getChannelTypes());
+            if (selectMenuBuilder.isDisabled()) newSelectMenuBuilder.setDisabled(true);
 
-                newSelectMenuBuilder.addOption(processedOption);
+            selectMenuBuilder.getOptions().forEach(selectOptionBuilder -> {
+                HellSelectOptionBuilder newSelectOptionBuilder = new HellSelectOptionBuilder().setLabel(apply(selectOptionBuilder.getLabel())).setValue(apply(selectOptionBuilder.getValue()));
+
+                    if (selectOptionBuilder.isDefaultOption()) newSelectOptionBuilder.setDefault(true);
+                    if (selectOptionBuilder.getDescription() != null) newSelectOptionBuilder.setDescription(apply(selectOptionBuilder.getDescription()));
+                    if (selectOptionBuilder.getEmojiAsUnicode() != null) newSelectOptionBuilder.setEmoji(apply(newSelectOptionBuilder.getEmojiAsUnicode()));
+                    if (selectOptionBuilder.getEmoji() != null) newSelectOptionBuilder.setEmoji(newSelectOptionBuilder.getEmoji());
+
+                newSelectMenuBuilder.addOption(newSelectOptionBuilder);
             });
 
             fixedEmbedBuilder.addSelectMenu(newSelectMenuBuilder);

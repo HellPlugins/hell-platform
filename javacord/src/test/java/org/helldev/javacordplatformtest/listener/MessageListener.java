@@ -37,11 +37,9 @@ public class MessageListener  implements MessageCreateListener {
             testConfig.message.with("test", "woooow placeholder").send(messageCreateEvent.getChannel());
         }
 
-        if (messageCreateEvent.getMessageContent().equalsIgnoreCase("testMember")) {
-            Member member = memberRepository.get(messageCreateEvent.getMessage().getUserAuthor().get());
-
-            testConfig.testtt.send(messageCreateEvent.getChannel());
-        }
+//        if (messageCreateEvent.getMessageContent().equalsIgnoreCase("testMember")) {
+//            testConfig.testtt.send(messageCreateEvent.getChannel());
+//        }
 
         if (messageCreateEvent.getMessageContent().equalsIgnoreCase("testEmbed")) {
             CompletableFuture<Message> futureMessage = testConfig.embed.send(messageCreateEvent.getChannel());
