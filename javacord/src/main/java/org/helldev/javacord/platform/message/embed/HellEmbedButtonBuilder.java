@@ -96,6 +96,11 @@ public class HellEmbedButtonBuilder {
         return this;
     }
 
+    //todo custom emoji emoji
+//    public HellEmbedButtonBuilder setEmoji(String emojiAsUnicode) {
+//        this.builder.setEmoji(emojiAsUnicode)
+//    }
+
     /**
      * Converts the HellEmbedButtonBuilder to a ButtonBuilder object.
      *

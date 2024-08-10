@@ -194,8 +194,8 @@ public class HellMessage {
 
                     if (selectOptionBuilder.isDefaultOption()) newSelectOptionBuilder.setDefault(true);
                     if (selectOptionBuilder.getDescription() != null) newSelectOptionBuilder.setDescription(apply(selectOptionBuilder.getDescription()));
-                    if (selectOptionBuilder.getEmojiAsUnicode() != null) newSelectOptionBuilder.setEmojiAsUnicode(apply(newSelectOptionBuilder.getEmojiAsUnicode()));
-                    if (selectOptionBuilder.getEmoji() != null) newSelectOptionBuilder.setEmoji(newSelectOptionBuilder.getEmoji());
+                    if (selectOptionBuilder.getEmojiAsUnicode() != null) newSelectOptionBuilder.setEmojiAsUnicode(selectOptionBuilder.getEmojiAsUnicode());
+                    if (selectOptionBuilder.getEmoji() != null) newSelectOptionBuilder.setEmoji(selectOptionBuilder.getEmoji());
 
                 newSelectMenuBuilder.addOption(newSelectOptionBuilder);
             });
