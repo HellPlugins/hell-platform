@@ -48,7 +48,6 @@ public class HellMessage {
         return placeholderContext != null ? placeholderContext.apply(compiledMessage) : "";
     }
 
-    @SuppressWarnings("unused")
     public void send(@NonNull Messageable messageable, @NonNull Consumer<Message> onSuccess, @NonNull Consumer<Throwable> onFailure) {
         CompletableFuture<Message> futureMessage = createMessageFuture(messageable);
         futureMessage
@@ -154,10 +153,13 @@ public class HellMessage {
         }
         if (from.getImageUrl() != null) fixedEmbedBuilder.setImage(apply(from.getImageUrl()));
         if (from.getAuthorName() != null) {
+            String authorUrl = from.getAuthorUrl() != null ? apply(from.getAuthorUrl()) : "";
+            String authorIconUrl = from.getAuthorIconUrl() != null ? apply(from.getAuthorIconUrl()) : "";
+
             fixedEmbedBuilder.setAuthor(
                 apply(from.getAuthorName()),
-                apply(from.getAuthorUrl()),
-                apply(from.getAuthorIconUrl())
+                authorUrl,
+                authorIconUrl
             );
         }
         if (from.getColor() != null) fixedEmbedBuilder.setColor(from.getColor());
@@ -189,18 +191,19 @@ public class HellMessage {
             if (selectMenuBuilder.getChannelTypes() != null) newSelectMenuBuilder.setChannelTypes(selectMenuBuilder.getChannelTypes());
             if (selectMenuBuilder.isDisabled()) newSelectMenuBuilder.setDisabled(true);
 
+            fixedEmbedBuilder.addSelectMenu(newSelectMenuBuilder);
+
             selectMenuBuilder.getOptions().forEach(selectOptionBuilder -> {
                 HellSelectOptionBuilder newSelectOptionBuilder = new HellSelectOptionBuilder().setLabel(apply(selectOptionBuilder.getLabel())).setValue(apply(selectOptionBuilder.getValue()));
 
-                    if (selectOptionBuilder.isDefaultOption()) newSelectOptionBuilder.setDefault(true);
-                    if (selectOptionBuilder.getDescription() != null) newSelectOptionBuilder.setDescription(apply(selectOptionBuilder.getDescription()));
-                    if (selectOptionBuilder.getEmojiAsUnicode() != null) newSelectOptionBuilder.setEmojiAsUnicode(selectOptionBuilder.getEmojiAsUnicode());
-                    if (selectOptionBuilder.getEmoji() != null) newSelectOptionBuilder.setEmoji(selectOptionBuilder.getEmoji());
+                if (selectOptionBuilder.isDefaultOption()) newSelectOptionBuilder.setDefault(true);
+                if (selectOptionBuilder.getDescription() != null) newSelectOptionBuilder.setDescription(apply(selectOptionBuilder.getDescription()));
+                System.out.println("emoji " + selectOptionBuilder.getEmojiAsUnicode());
+                if (selectOptionBuilder.getEmojiAsUnicode() != null) newSelectOptionBuilder.setEmoji(selectOptionBuilder.getEmojiAsUnicode());
+                if (selectOptionBuilder.getEmoji() != null) newSelectOptionBuilder.setEmoji(selectOptionBuilder.getEmoji());
 
                 newSelectMenuBuilder.addOption(newSelectOptionBuilder);
             });
-
-            fixedEmbedBuilder.addSelectMenu(newSelectMenuBuilder);
         });
 
         return fixedEmbedBuilder;
