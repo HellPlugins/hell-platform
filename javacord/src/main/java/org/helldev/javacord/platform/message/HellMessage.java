@@ -14,6 +14,7 @@ import org.helldev.javacord.platform.message.embed.HellSelectOptionBuilder;
 import org.helldev.javacord.platform.message.type.HellMessageType;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.component.ActionRow;
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
@@ -34,12 +35,18 @@ public class HellMessage {
     private final Object value;
 
     private static PlaceholderContext placeholderContext = null;
+    private boolean ephemeral = false;
 
     public HellMessage with(@NonNull String key, @NonNull Object value) {
         if (placeholderContext == null) {
             placeholderContext = PlaceholderContext.create();
         }
         placeholderContext.with(key, value);
+        return this;
+    }
+
+    public HellMessage setEphemeral() {
+        this.ephemeral = true;
         return this;
     }
 
@@ -83,15 +90,20 @@ public class HellMessage {
         }
     }
 
-    public void applyToResponder(@NonNull InteractionImmediateResponseBuilder responder) {
+    public HellMessage applyToResponder(@NonNull InteractionImmediateResponseBuilder responder) {
+        if (placeholderContext == null) {
+            placeholderContext = PlaceholderContext.create();
+        }
         applyToResponder(responder, placeholderContext);
+        return this;
     }
 
-    public void applyToResponder(@NonNull InteractionImmediateResponseBuilder responder, @NonNull PlaceholderContext context) {
+    public HellMessage applyToResponder(@NonNull InteractionImmediateResponseBuilder responder, @NonNull PlaceholderContext context) {
         placeholderContext = context;
         Object processedValue = processValue();
         applyProcessedValueToResponder(responder, processedValue);
         resetPlaceholders();
+        return this;
     }
 
     private String getProcessedMessage() {
@@ -122,7 +134,12 @@ public class HellMessage {
             default:
                 throw new OkaeriException("Unknown message type: " + this.messageType);
         }
+
+        if (this.ephemeral) {
+            responder.setFlags(MessageFlag.EPHEMERAL);
+        }
     }
+
 
     private void addComponentsToMessageBuilder(MessageBuilder messageBuilder, HellEmbedBuilder hellEmbedBuilder) {
         List<ActionRow> actionRows = new ArrayList<>();
@@ -207,8 +224,6 @@ public class HellMessage {
 
         return fixedEmbedBuilder;
     }
-
-
 
     private void resetPlaceholders() {
         placeholderContext = null;
