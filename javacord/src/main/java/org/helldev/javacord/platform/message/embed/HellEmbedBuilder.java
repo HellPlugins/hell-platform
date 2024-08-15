@@ -263,6 +263,13 @@ public class HellEmbedBuilder {
         return this;
     }
 
+    public HellSelectMenuBuilder getSelectMenuById(String id) {
+        for (HellSelectMenuBuilder hellSelectMenuBuilder : selectMenus) {
+            if (hellSelectMenuBuilder.getCustomId().equalsIgnoreCase(id)) return hellSelectMenuBuilder;
+        }
+        return null;
+    }
+
     /**
      * Converts this builder into a Javacord EmbedBuilder.
      *
