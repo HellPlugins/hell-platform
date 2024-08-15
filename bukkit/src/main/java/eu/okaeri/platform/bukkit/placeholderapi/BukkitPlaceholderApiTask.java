@@ -1,4 +1,4 @@
-package eu.okaeri.platform.bukkit.plan;
+package eu.okaeri.platform.bukkit.placeholderapi;
 
 import eu.okaeri.placeholders.Placeholders;
 import eu.okaeri.placeholders.bukkit.placeholderapi.PlaceholderApiPlaceholders;
@@ -11,6 +11,10 @@ public class BukkitPlaceholderApiTask implements ExecutionTask<OkaeriBukkitPlugi
 
     @Override
     public void execute(OkaeriBukkitPlugin platform) {
+
+        if (!platform.getClass().isAnnotationPresent(EnablePlaceholderAPI.class)) {
+            return;
+        }
 
         if (platform.getServer().getPluginManager().getPlugin("PlaceholderAPI") == null) {
             return;
