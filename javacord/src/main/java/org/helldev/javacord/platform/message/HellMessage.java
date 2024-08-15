@@ -140,7 +140,6 @@ public class HellMessage {
         }
     }
 
-
     private void addComponentsToMessageBuilder(MessageBuilder messageBuilder, HellEmbedBuilder hellEmbedBuilder) {
         List<ActionRow> actionRows = new ArrayList<>();
         hellEmbedBuilder.getButtons().forEach(button -> actionRows.add(ActionRow.of(button.toButtonBuilder().build())));
@@ -153,6 +152,41 @@ public class HellMessage {
         hellEmbedBuilder.getButtons().forEach(button -> actionRows.add(ActionRow.of(button.toButtonBuilder().build())));
         hellEmbedBuilder.getSelectMenus().forEach(selectMenu -> actionRows.add(ActionRow.of(selectMenu.getSelectMenuBuilder().build())));
         actionRows.forEach(responder::addComponents);
+    }
+
+    public HellMessage addButton(@NonNull HellEmbedButtonBuilder buttonBuilder) {
+        if (!(this.value instanceof HellEmbedBuilder)) {
+            throw new OkaeriException("Cannot add button to non-embed message type.");
+        }
+
+        HellEmbedBuilder embedBuilder = (HellEmbedBuilder) this.value;
+        embedBuilder.addButton(buttonBuilder);
+        return this;
+    }
+
+    public HellMessage addSelectMenu(@NonNull HellSelectMenuBuilder selectMenuBuilder) {
+        if (!(this.value instanceof HellEmbedBuilder)) {
+            throw new OkaeriException("Cannot add select menu to non-embed message type.");
+        }
+
+        HellEmbedBuilder embedBuilder = (HellEmbedBuilder) this.value;
+        embedBuilder.addSelectMenu(selectMenuBuilder);
+        return this;
+    }
+
+    public HellMessage addSelectOption(@NonNull String selectMenuId, @NonNull HellSelectOptionBuilder selectOptionBuilder) {
+        if (!(this.value instanceof HellEmbedBuilder embedBuilder)) {
+            throw new OkaeriException("Cannot add select option to non-embed message type.");
+        }
+
+        HellSelectMenuBuilder selectMenuBuilder = embedBuilder.getSelectMenuById(selectMenuId);
+
+        if (selectMenuBuilder == null) {
+            throw new OkaeriException("Select menu with id " + selectMenuId + " not found.");
+        }
+
+        selectMenuBuilder.addOption(selectOptionBuilder);
+        return this;
     }
 
     public static HellEmbedBuilder applyEmbedBuilder(@NonNull HellEmbedBuilder from) {
